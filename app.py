@@ -1,5 +1,6 @@
 from heapq import heappop
 from shutil import move
+from turtle import bgcolor
 import streamlit as st
 import shap
 import pickle
@@ -37,7 +38,7 @@ def explain_model_prediction(data,catbe):
         return p, shap_values
 
 def st_shap(plot, height=None):
-    shap_html = f"<head>{shap.getjs()}</head><body >{plot.html()}</body>"
+    shap_html = f"<head>{shap.getjs()}</head><body>{plot.html()}</body>"
     components.html(shap_html, height=height)
 
 
@@ -63,22 +64,22 @@ def main():
         <style>
         .container {
             display: flex;
+            background-color: #DCF6F5;
           
         }
-        .bg_color{
-            background-color: #F6DCE8;
-        }
+        
         .logo-text {
             font-weight:600 !important;
-            font-size:60px !important;
+            font-size:45px !important;
             color: #1D7AA7 !important;
-            padding-top: 75px !important;
+            padding-top: 175px !important;
             padding-left: 75px !important;
             
         }
         .logo-img {
             float:right;
             width:50%;
+            
         }
         </style>
         """,
@@ -94,9 +95,7 @@ def main():
         """,
         unsafe_allow_html=True
     )
-    st.markdown(f"""
-        <div class="bg_color">""", unsafe_allow_html=True) 
-    
+        
     with st.form('prediction_form'):
        
 
@@ -154,7 +153,7 @@ def main():
         p, shap_values = explain_model_prediction(df,catbe)
         st.subheader('CO2 Interpretation')
         st_shap(p)
-    st.markdown(f"""</div>""", unsafe_allow_html=True)  
+    
     
 
 if __name__ == '__main__':
