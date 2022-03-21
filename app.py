@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 import base64
 import joblib
+import math
 import streamlit.components.v1 as components
 from predict import get_prediction
 from PIL import Image
@@ -17,6 +18,7 @@ img_bg = Image.open('Img/seui_bg.jpg')
 img_icons = Image.open('Img/seui_icons.png')
 img_01 = Image.open('Img/seui_img01.jpg')
 img_02 = Image.open('Img/seui_img02.jpg')
+
 
 
 
@@ -35,7 +37,7 @@ def explain_model_prediction(data,catbe):
         return p, shap_values
 
 def st_shap(plot, height=None):
-    shap_html = f"<head>{shap.getjs()}</head><body background_image=img_bg>{plot.html()}</body>"
+    shap_html = f"<head>{shap.getjs()}</head><body >{plot.html()}</body>"
     components.html(shap_html, height=height)
 
 
@@ -52,26 +54,37 @@ Features = ['snowfall_inches', 'heating_degree_days', 'rainy',
 
 
 def main():
+    
+
+
+    
     st.markdown(
         """
         <style>
         .container {
             display: flex;
+          
+        }
+        .bg_color{
+            background-color: #F6DCE8;
         }
         .logo-text {
             font-weight:600 !important;
-            font-size:40px !important;
-            color: #f9a01b !important;
+            font-size:60px !important;
+            color: #1D7AA7 !important;
             padding-top: 75px !important;
+            padding-left: 75px !important;
+            
         }
         .logo-img {
             float:right;
+            width:50%;
         }
         </style>
         """,
         unsafe_allow_html=True
     )
-
+    
     st.markdown(
         f"""
         <div class="container">
@@ -81,17 +94,20 @@ def main():
         """,
         unsafe_allow_html=True
     )
-
+    st.markdown(f"""
+        <div class="bg_color">""", unsafe_allow_html=True) 
+    
     with st.form('prediction_form'):
+       
 
-        st.subheader("Enter the input for following info:")
+        st.header("Enter the input for following info:")
 
         col1, col2, = st.columns(2)
         
         with col1:
       
             inp = {}
-            st.subheader("Temperature (in Farenheit)")
+            st.subheader("Temperature (in Farenheit)",)
             rainy = st.number_input("Rainy(May-Sep) :", value = 0.0, format="%f")
             summer = st.number_input("Summer(Jan-April) :", value = 0.0, format="%f")
             avg = st.number_input("Aveage(yearly) :",value = 0.0, format="%f")
@@ -131,14 +147,15 @@ def main():
         df = pd.DataFrame.from_dict([inp])
         pred = get_prediction(data=df, model=catb)
 
-        st.markdown("""<style> .big-font { font-family:sans-serif; color:Black; font-size: 50px; } </style> """, unsafe_allow_html=True)
-        st.markdown(f'<p class="big-font">{pred} of CO2 is estimated.</p>', unsafe_allow_html=True)
+        st.markdown("""<style> .big-font { font-family:sans-serif; color: #1D7AA7 ; font-size: 50px; } </style> """, unsafe_allow_html=True)
+        st.markdown(f'<p class="big-font">{round(pred, 2)} of CO2 is estimated.</p>', unsafe_allow_html=True)
         #st.write(f" => {pred} is predicted. <=")
 
         p, shap_values = explain_model_prediction(df,catbe)
         st.subheader('CO2 Interpretation')
         st_shap(p)
-
+    st.markdown(f"""</div>""", unsafe_allow_html=True)  
+    
 
 if __name__ == '__main__':
     main()
