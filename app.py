@@ -1,6 +1,5 @@
 from heapq import heappop
 from shutil import move
-from turtle import bgcolor
 import streamlit as st
 import shap
 import pickle
