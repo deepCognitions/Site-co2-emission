@@ -1,3 +1,4 @@
+from argparse import FileType
 from heapq import heappop
 from shutil import move
 import streamlit as st
@@ -21,10 +22,10 @@ img_02 = Image.open('Img/seui_img02.jpg')
 
 
 
-
-
 with open('Model/catb__final.joblib', 'rb') as f:
     catb = joblib.load(f)
+with open('Notebook/facility.pkl', 'rb') as t:
+    options_ftype = list(joblib.load(t))
 #shap.initjs()      
 
 catbe = shap.TreeExplainer(catb)
@@ -47,10 +48,10 @@ st.set_page_config(page_title="Deep =>  Site's CO2 Emission evaluation",
                    
   
 
-Features = ['snowfall_inches', 'heating_degree_days', 'rainy',
-       'cooling_degree_days', 'days_below_30f', 'days_below_20f', 'summer',
-       'precipitation_inches', 'avg_temp', 'snowdepth_inches',
-       'days_above_80f', 'days_below_10f']
+Features = ['energy_star_rating', 'cooling_degree_days', 'heating_degree_days', 'precipitation_inches',
+       'snowfall_inches', 'snowdepth_inches','days_below_30f',
+       'days_below_20f', 'days_below_10f', 'days_above_80f',
+       'days_with_fog', 'facility_type', 'summer', 'rainy']
 
 
 def main():
@@ -105,6 +106,7 @@ def main():
         with col1:
       
             inp = {}
+            facility = st.selectbox("Facility type ", options=options_ftype)
             st.subheader("Temperature (in Farenheit)",)
             rainy = st.number_input("Rainy(May-Sep) :", value = 0.0, format="%f")
             summer = st.number_input("Summer(Jan-April) :", value = 0.0, format="%f")
@@ -116,11 +118,13 @@ def main():
             precip = st.number_input("Precipitation :",value = 0.0, format="%f")
             
         with col2:
+            energy = st.number_input("Energy Rating :", max_value = 100, step=1, value = 0, format="%d")
             st.subheader("Total Days")
             below30 = st.number_input("Days below 30F :", value = 0, format="%d")
             below20 = st.number_input("Days below 20F :", value = 0, format="%d")
             below10 = st.number_input("Days below 10F :", value = 0, format="%d")
             above80 = st.number_input("Days above 80F :",value = 0, format="%d")
+            foggy = st.number_input("Foggy days :",value = 0, format="%d")
 
             st.subheader("Degree days")
             cooling = st.number_input("Cooling Deg days :", value = 0, format="%d")
@@ -129,18 +133,20 @@ def main():
 
 
     if submit:
-        inp["snowfall_inches"] = snowfall
-        inp["heating_degree_days"] = heating
-        inp["rainy"] = rainy
+        inp["energy_star_rating"] = energy
         inp["cooling_degree_days"] = cooling
+        inp["heating_degree_days"] = heating
+        inp["precipitation_inches"] = precip
+        inp["snowfall_inches"] = snowfall
+        inp["snowdepth_inches"] = snowdepth
         inp["days_below_30f"] = below30
         inp["days_below_20f"] = below20
-        inp["summer"] = summer
-        inp["precipitation_inches"] = precip
-        inp["avg_temp"] = avg
-        inp["snowdepth_inches"] = snowdepth
-        inp["days_above_80f"] = above80
         inp["days_below_10f"] = below10
+        inp["days_above_80f"] = above80
+        inp["days_with_fog"] = foggy
+        inp["facility_type"] = options_ftype.index(facility)
+        inp["summer"] = summer
+        inp["rainy"] = rainy
 
         df = pd.DataFrame.from_dict([inp])
         pred = get_prediction(data=df, model=catb)
