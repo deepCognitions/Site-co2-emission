@@ -98,7 +98,6 @@ def main():
         """,
         unsafe_allow_html=True
     )
-    st.markdown(f'''{options_ftype}''')
         
     with st.form('prediction_form'):
        
