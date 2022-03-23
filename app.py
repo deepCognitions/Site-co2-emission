@@ -24,8 +24,11 @@ img_02 = Image.open('Img/seui_img02.jpg')
 
 with open('Model/catb__final.joblib', 'rb') as f:
     catb = joblib.load(f)
-with open('Notebook/facility.pkl', 'rb') as t:
-    options_ftype = list(joblib.load(t))
+
+open_file = open("Notebook/facility_list", "rb")
+options_ftype = pickle.load(open_file)
+open_file.close()
+
 #shap.initjs()      
 
 catbe = shap.TreeExplainer(catb)
@@ -95,6 +98,7 @@ def main():
         """,
         unsafe_allow_html=True
     )
+    st.markdown(f'''{options_ftype}''')
         
     with st.form('prediction_form'):
        
